@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nttdata.fhir.dao.ProfileFieldDao">
+    <select id="getAllByProfileId" resultMap="profileFieldResult">
+		SELECT
+			<include refid="com.nttdata.fhir.dao.mybatis.ProfileFieldVOMapper.Base_Column_List"/>			
+		FROM		
+	   	   profileField
+	    WHERE
+	       profileField.profileTypeId = #{profileTypeId}
+    </select>
+    
+    <select id="getList" resultMap="profileFieldResult">
+		SELECT
+			<include refid="com.nttdata.fhir.dao.mybatis.ProfileFieldVOMapper.Base_Column_List"/>			
+		FROM		
+	   	   profileField
+	    WHERE
+	       profileField.profileTypeId = #{search.profileTypeId}
+	       <if test = "(search.optional)">
+			     AND	profileField.isRequired = 0
+		   </if>
+		   <if test = "(search.required)">
+			     AND	profileField.isRequired = 1
+		   </if>
+		   <if test = "(search.customField)">
+			     AND	profileField.isCustomField = 1
+		   </if>
+    </select>
+    
+    
+    
+    <!-- <select id="getOptionalByProfileId" resultMap="profileFieldResult">
+		SELECT
+			<include refid="com.nttdata.fhir.dao.mybatis.ProfileFieldVOMapper.Base_Column_List"/>			
+		FROM		
+	   	   profileField
+	    WHERE
+	       profileField.profileTypeId = #{profileTypeId}
+    </select>
+    
+    <select id="getCustomByProfileId" resultMap="profileFieldResult">
+		SELECT
+			<include refid="com.nttdata.fhir.dao.mybatis.ProfileFieldVOMapper.Base_Column_List"/>			
+		FROM		
+	   	   profileField
+	    WHERE
+	       profileField.profileTypeId = #{profileTypeId}
+	       AND 
+    </select> -->
+       
+    <resultMap id="profileFieldResult" type="com.nttdata.fhir.model.ProfileField" extends="com.nttdata.fhir.dao.mybatis.ProfileFieldVOMapper.BaseResultMap"/>  
+</mapper>

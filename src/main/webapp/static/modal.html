@@ -1,0 +1,19 @@
+<div class="modal-header">
+
+    <h3><span class="glyphicon glyphicon-alert"></span><br/>{{modalOptions.headerText}}</h3>
+    
+    <div class="modal-body">
+        <p>{{modalOptions.bodyText}}</p>
+    </div>
+
+    <div class="modal-footer">
+        <span ng-show="modalOptions.hasCloseButton">        
+            <button type="button" class="btn btn-default" data-ng-click="modalOptions.close()">{{modalOptions.closeButtonText}}</button>
+        </span>
+        
+        <span ng-show="modalOptions.actionButtonText != ''">
+            <button class="btn btn-danger" data-ng-click="modalOptions.ok();">{{modalOptions.actionButtonText}}</button>
+        </span>
+    </div>
+ 
+</div>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+  "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+  	   <classPathEntry location="C:\Users\129978\.m2\repository\mysql\mysql-connector-java\6.0.6\mysql-connector-java-6.0.6.jar" />
+ <!--  <classPathEntry location="./build/classes" />
+ -->
+  <context id="fhirmapperui" targetRuntime="MyBatis3">
+
+    <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+    <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+        connectionURL="jdbc:mysql://localhost:3306/fhirui"
+        userId="root"
+        password="W3BU$3rD3V3LopM3nT!">
+    </jdbcConnection>
+
+    <javaTypeResolver >
+      <property name="forceBigDecimals" value="false" />
+    </javaTypeResolver>
+
+    <javaModelGenerator targetPackage="com.nttdata.fhir.model.mybatis" targetProject="fhirmapperui/src">
+      <property name="rootClass" value="com.nttdata.fhir.model.DataObject" />
+      <property name="enableSubPackages" value="true" />
+      <property name="trimStrings" value="true" />
+    </javaModelGenerator>
+
+    <sqlMapGenerator targetPackage="com.nttdata.fhir.dao.mybatis"  targetProject="fhirmapperui/src">
+      <property name="enableSubPackages" value="true" />
+    </sqlMapGenerator>
+	
+    <javaClientGenerator type="XMLMAPPER" targetPackage="com.nttdata.fhir.dao.mybatis"  targetProject="fhirmapperui/src">
+      <property name="enableSubPackages" value="true" />
+    </javaClientGenerator>
+    
+     <table tableName="appUser" alias="appUser" domainObjectName="AppUserVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+         <generatedKey column="id" identity="true" sqlStatement="SELECT LAST_INSERT_ID()"/>
+    </table>
+
+    <table tableName="baseprofiletype" alias="baseprofiletype" domainObjectName="BaseProfileTypeVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+        <generatedKey column="id" identity="true" sqlStatement="SELECT LAST_INSERT_ID()"/>
+    </table>  
+
+    <table tableName="hl7field" alias="hl7field" domainObjectName="HL7FieldVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/> 
+        <generatedKey column="fieldId" identity="true" sqlStatement="SELECT LAST_INSERT_ID()"/>
+    </table>
+
+    <table tableName="hl7segment" alias="hl7segment" domainObjectName="HL7SegmentVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+         <generatedKey column="segmentId" identity="true" sqlStatement="SELECT LAST_INSERT_ID()"/>
+    </table>
+
+    <table tableName="profilefield" alias="profilefield" domainObjectName="ProfileFieldVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+         <generatedKey column="id" identity="true" sqlStatement="SELECT LAST_INSERT_ID()"/>
+    </table>
+    
+    <table tableName="resource" alias="resource" domainObjectName="ResourceVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+         <generatedKey column="id" identity="true" sqlStatement="SELECT LAST_INSERT_ID()"/>
+    </table> 
+		
+    <table tableName="role" alias="role" domainObjectName="RoleVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+        <generatedKey column="id" identity="true" sqlStatement="SELECT LAST_INSERT_ID()"/>
+    </table>
+    
+    
+		
+    <!-- <table tableName="roleActivity" alias="roleActivity" domainObjectName="RoleActivityVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+        <generatedKey column="id" identity="false" sqlStatement="EXEC dh_generateSeqIds_Update 'roleActivity'"/>
+        <columnOverride column="startDate" javaType="java.util.Date" jdbcType="DATE"/>
+        <columnOverride column="endDate" javaType="java.util.Date" jdbcType="DATE"/>
+    </table> -->
+	
+   
+  
+		
+   <!--  <table tableName="task" alias="task" domainObjectName="TaskVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+        <generatedKey column="id" identity="false" sqlStatement="EXEC dh_generateSeqIds_Update 'task'"/>
+        <columnOverride column="referralDate" javaType="java.util.Date" jdbcType="DATE"/>
+        <columnOverride column="completionDate" javaType="java.util.Date" jdbcType="DATE"/>
+        <columnOverride column="nextActionDate" javaType="java.util.Date" jdbcType="DATE"/>
+    </table> -->
+	<!-- 	
+    <table tableName="taskAttribute" alias="taskAttribute" domainObjectName="TaskAttributeVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+        <generatedKey column="id" identity="false" sqlStatement="EXEC dh_generateSeqIds_Update 'taskAttribute'"/>
+    </table>
+		
+    <table tableName="taskType" alias="taskType" domainObjectName="TaskTypeVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+        <generatedKey column="id" identity="false" sqlStatement="EXEC dh_generateSeqIds_Update 'taskType'"/>
+    </table>
+		
+    <table tableName="taskTypeAttribute" alias="taskTypeAttribute" domainObjectName="TaskTypeAttributeVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+        <generatedKey column="id" identity="false" sqlStatement="EXEC dh_generateSeqIds_Update 'taskTypeAttribute'"/>
+    </table>
+		
+    <table tableName="workflow" alias="workflow" domainObjectName="WorkflowVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+        <generatedKey column="id" identity="false" sqlStatement="EXEC dh_generateSeqIds_Update 'workflow'"/>
+    </table>
+		
+    <table tableName="workflowConstraint" alias="workflowConstraint" domainObjectName="WorkflowConstraintVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+    </table> -->
+				
+   <!--  <table tableName="workflowStatus" alias="workflowStatus" domainObjectName="WorkflowStatusVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+        <generatedKey column="id" identity="false" sqlStatement="EXEC dh_generateSeqIds_Update 'workflowStatus'"/>
+    </table>
+		 -->
+   
+
+
+  </context>
+</generatorConfiguration>
+
+

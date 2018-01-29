@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+
+  <Appenders>
+    <!-- Appenders -->
+    <Console name="console" target="SYSTEM_OUT">
+         <PatternLayout pattern="[%20d] %-5p [%threadId] [%X{userId}] %-50.50c - %m%n"/>
+    </Console>
+  </Appenders>
+  
+  <Loggers>
+    <!-- Application Loggers -->
+    <Logger name="com.nttdata.fhir" level="debug"/>
+    <!-- <Logger name="com.nttdata.fhir.shared.logging.LogInfoFilter" level="info"/>
+    <Logger name="com.nttdata.fhir.appcentral.controller.angular.TemplateController" level="info"/> -->
+  
+    <!-- 3rdparty Loggers -->
+    <Logger name="org.apache.commons" level="info" />
+    <Logger name="org.mybatis.spring" level="info" />
+    
+    <Logger name="org.springframework" level="info" />
+    <Logger name="org.springframework.cache" level="info" />
+    <Logger name="org.springframework.core" level="info" /> 
+    <Logger name="org.springframework.beans" level="info" />  
+    <Logger name="org.springframework.context" level="info" />
+    <Logger name="org.springframework.web" level="info" />  
+    <Logger name="org.springframework.cache" level="info" />
+    <Logger name="org.mybatis" level="info" />
+    <Logger name="org.apache.ibatis" level="info" />
+    
+    <Logger name="java.sql.ResultSet" level="info" />
+    <Logger name="java.sql.Connection" level="info" />
+    <Logger name="java.sql.Statement" level="info" />
+    <Logger name="java.sql.PreparedStatement" level="info" />
+    
+
+  
+    <!-- Root Logger -->
+    <Root level="debug">
+      <AppenderRef ref="console" />
+    </Root>
+  </Loggers>
+  
+</Configuration>

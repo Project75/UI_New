@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+    <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+           <param name="Threshold" value="debug"/>
+           <layout class="org.apache.log4j.PatternLayout">
+             <param name="ConversionPattern"  value="(%F:%L) %-5p - |%m|%n"/>
+           </layout>        
+    </appender>
+ 
+ 	<!-- 
+ 		- %C == fully qualified class name
+ 		- %n == new line
+ 	 -->
+ 
+    <category name="org.apache"><priority value="error" /></category>
+    <category name="org.springframework"><priority value="error" /></category>
+    <category name="com.ibm.ws"><priority value="error" /></category>
+	<category name="org.nttdata.fhir"><priority value="debug" /></category>
+    <category name="com.luosys.pta.control.support"><priority value="error" /></category>
+
+    <root>
+       <appender-ref ref="STDOUT" />
+    </root>
+    
+</log4j:configuration>

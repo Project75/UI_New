@@ -1,0 +1,14 @@
+<?xml-stylesheet type="text/xsl" href="idsequence_seed_sql.xsl"?>
+<tables>
+    <!-- <table twoCharAbbr="AC">activity</table> -->
+    <table twoCharAbbr="AU">appUser</table>
+    <!-- <table twoCharAbbr="AR">appUserRole</table> -->
+    <table twoCharAbbr="PT">baseprofiletype</table>
+    <table twoCharAbbr="FI">hl7field</table>
+    <table twoCharAbbr="SE">hl7segment</table>
+    <table twoCharAbbr="PF">profilefields</table>
+    <table twoCharAbbr="RE">resource</table>
+    <table idGenerateIgnore="true">idSequence</table>
+    <table twoCharAbbr="RO">role</table>
+</tables>
+            

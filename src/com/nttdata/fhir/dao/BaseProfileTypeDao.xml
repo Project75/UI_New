@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nttdata.fhir.dao.BaseProfileTypeDao">
+    <select id="getAll" resultMap="baseProfileTypeResult">
+		SELECT
+			<include refid="com.nttdata.fhir.dao.mybatis.BaseProfileTypeVOMapper.Base_Column_List"/>			
+		FROM		
+	   	   baseProfileType
+	    WHERE
+	       baseProfileType.isActive = 1
+      	ORDER BY
+	   	    baseProfileType.profileName
+    </select>
+       
+    <resultMap id="baseProfileTypeResult" type="com.nttdata.fhir.model.BaseProfileType" extends="com.nttdata.fhir.dao.mybatis.BaseProfileTypeVOMapper.BaseResultMap"/>  
+</mapper>

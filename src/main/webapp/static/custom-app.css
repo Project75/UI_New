@@ -1,0 +1,145 @@
+body, #mainWrapper {
+	height: 70%;
+	background-color:rgb(245, 245, 245);
+}
+
+body, .form-control{
+	font-size:12px!important;
+}
+
+.floatRight{
+	float:right;
+	margin-right: 18px;
+}
+
+.has-error{
+	color:red;
+}
+
+.formcontainer{
+	background-color: #DAE8E8;
+	padding: 20px;
+}
+
+.tablecontainer{
+	padding-left: 20px;
+}
+
+.generic-container {
+  width:80%;
+  margin-left: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background-color: #EAE7E7;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 0 30px black;
+}
+
+.custom-width {
+    width: 80px !important;
+}
+
+
+.fhir-form-control-text {
+	padding-top: 7px;
+	padding-left: 5px;
+}
+
+
+.fhir-notificationMessageModal-modal-window .modal-dialog { 
+  width:1000px;
+}
+
+.fhir-xeditable-input > tbody> tr > td > span > span > input {
+   width: 800px;
+}
+.fhir-errorCondition-link{
+  color: red;
+ 
+}
+.fhir-errorCondition-link:hover {
+color:#c31212;
+}
+
+.fhir-addMappingModal .modal-dialog { 
+  width: 900px;
+}
+
+
+
+
+.fhir-logPropertyTable td:first-of-type {
+	border-top: 1px solid gainsboro;
+	text-align: right;
+	padding-right: 10px;
+	vertical-align: top;
+	width: 200px;
+}
+
+.fhir-logPropertyTable td {
+	border-top : 1px solid gainsboro;
+	vertical-align: top;
+}
+
+.tooltip-inner {
+    max-width: 800px !important;
+}
+
+.modal-header h3{
+	color:#ED7420;
+	text-align:center;
+}
+
+.modal-body p{
+	color:#ED7420;
+}
+
+
+.rowLabel {
+		width:150px;
+		font-weight:bold;
+		text-align:right;
+		vertical-align:top;
+		padding-right:10px;
+	}
+
+.rowLabelWide {
+		width:250px;
+		font-weight:bold;
+		text-align:right;
+		vertical-align:top;
+		padding-right:10px;
+	}
+
+.attributeDifferent {
+	    background-color:yellow;
+	    font-weight:normal;
+}
+	
+	
+/*
+  The following block of code is included to make the cells in the tr-ng-grid tables selectable. 
+  This could cause issues if ever selectable rows are used.
+*/	
+.tr-ng-grid > tbody > tr > td > .tr-ng-cell
+{
+    -webkit-touch-callout: text !important;
+    -webkit-user-select: text !important;
+    -khtml-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+}	
+
+
+.fhir-isteven-multi-select-error > span > button {
+	border: solid 1px #a94442;
+}
+
+.fhir-isteven-multi-select-error .acol .ng-binding { 	
+	border: none;
+}
+
+
