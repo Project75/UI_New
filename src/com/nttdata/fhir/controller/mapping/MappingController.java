@@ -151,6 +151,8 @@ public class MappingController {
 		LOG.info("apiURL:" + apiURL);
 		if ( StringUtils.isBlank(apiURL) ) apiURL = "http://172.20.17.70:8090/fhirtranslator/v1/mappings/";	
 		
+		
+		
 		try
 			{
 			inputJSONArray = mappingService.createMappingInputForAPI(mapping);
