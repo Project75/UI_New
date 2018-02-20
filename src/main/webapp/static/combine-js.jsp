@@ -41,9 +41,14 @@ response.setHeader("Content-Type","application/javascript");
 
 
 <c:import url="js/controllers/MappingListCtrl.js" />
+<c:import url="js/controllers/MappingDetailCtrl.js" />
 <c:import url="js/controllers/AddMappingCtrl.js" />
 
+<c:import url="js/controllers/ProfileListCtrl.js" />
+<c:import url="js/controllers/ProfileDetailCtrl.js" />
+
 <c:import url="js/services/MappingService.js" />
+<c:import url="js/services/ProfileService.js" />
 
 <c:import url="js/services/ErrorHandlerService.js" />
 <c:import url="js/services/NotificationService.js" />

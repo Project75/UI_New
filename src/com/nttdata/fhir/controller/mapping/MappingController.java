@@ -1,24 +1,23 @@
 package com.nttdata.fhir.controller.mapping;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -69,7 +68,7 @@ public class MappingController {
 			
 			model.setResourceList(resourceList);
 			model.setBaseProfileTypeList(baseProfileList);
-
+			
 		} catch (SecurityException se) {
 			LOG.warn(se.toString());
 			return new ResponseEntity<MappingAddModel>(HttpStatus.UNAUTHORIZED);
@@ -87,47 +86,69 @@ public class MappingController {
 	public ResponseEntity<String> getList() {
 		
 		String apiURL = env.getProperty("translatorApiURL");
-		MappingAddModel model = new MappingAddModel();
-		JSONObject  resultJson = null;
-		StringBuffer stringBuffer = null;
 		String result = null;
-		
-		LOG.info("apiURL:" + apiURL);
-		if ( StringUtils.isBlank(apiURL) ) apiURL = "http://172.20.17.70:8090/fhirtranslator/v1/mappings/";
-
 		try {
 			
-			String path = apiURL + "view/" ;
+			String path = apiURL + "getall/" ;
+			LOG.info("path : " +  path);
+			
+			result = mappingService.getResponseFromAPI(path);
+			
+		} catch (SecurityException se) {
+			LOG.warn(se.toString());
+			return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
+		} catch (Throwable t) {
+			LOG.error(t.getMessage());
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		return new ResponseEntity<String>(result, HttpStatus.OK);
+	}
+	
+	
+	@RequestMapping(value = "/getById/{mappingId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<String> getById(@PathVariable String mappingId) {
+		
+		String apiURL = env.getProperty("translatorApiURL");
+		String result = null;
+		try {
+			
+			String path = apiURL + "get/" + mappingId ;
+			LOG.info("path : " +  path);
+			
+			result = mappingService.getResponseFromAPI(path);
+			
+		} catch (SecurityException se) {
+			LOG.warn(se.toString());
+			return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
+		} catch (Throwable t) {
+			LOG.error(t.getMessage());
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		return new ResponseEntity<String>(result, HttpStatus.OK);
+	}
+	
+	
+	@RequestMapping(value = "/delete/{mappingId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<String> delete(@PathVariable String mappingId) {
+		
+		String apiURL = env.getProperty("translatorApiURL");
+		String result = null;
+		try {
+			
+			String path = apiURL + "delete/" + mappingId ;
 			LOG.info("path : " +  path);
 			
 			HttpClient httpClient = HttpClientBuilder.create().build();
-			HttpGet getRequest = new HttpGet(path);
+			HttpDelete deleteRequest = new HttpDelete(path);
 
-			HttpResponse response = httpClient.execute(getRequest);
+			HttpResponse response = httpClient.execute(deleteRequest);
 			
-			LOG.info("Status code:" + response.getStatusLine().getStatusCode());
-			LOG.info("Status Line :" + response.getStatusLine());
-			LOG.info("resposne :" + response.toString());
-			LOG.info("message:" + response.getEntity().getContent());
-			
-			
-			if (response.getStatusLine().getStatusCode() == 200) {
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(response.getEntity().getContent()));
-
-					stringBuffer = new StringBuffer();
-					String line = "";
-					while ((line = reader.readLine()) != null) {
-						stringBuffer.append(line);
-					}
-					
-				resultJson  = new JSONObject(response.getEntity().getContent());
-			}
-			
-			result = stringBuffer.toString();
-			System.out.println("result :"  + result);
-			
-			
+			LOG.info("Status Line :" + response.getStatusLine().getStatusCode());
+			//if (response.getStatusLine().getStatusCode() == 200) 
 			
 		} catch (SecurityException se) {
 			LOG.warn(se.toString());
@@ -144,40 +165,46 @@ public class MappingController {
 	@RequestMapping(value = "/saveMappping", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> saveMappping(@RequestBody MappingOptions mapping ) {
-		JSONArray inputJSONArray = null;
+		JSONObject inputMappingJSON = null;
 		String apiURL = env.getProperty("translatorApiURL");
-		//String successMessage = "";
+		HttpResponse response = null;
+		String path = null;
 		
-		LOG.info("apiURL:" + apiURL);
-		if ( StringUtils.isBlank(apiURL) ) apiURL = "http://172.20.17.70:8090/fhirtranslator/v1/mappings/";	
-		
-		
+		LOG.info("apiURL:" + apiURL);	
 		
 		try
 			{
-			inputJSONArray = mappingService.createMappingInputForAPI(mapping);
-			LOG.info("Input for API :" + inputJSONArray);
+			inputMappingJSON = mappingService.createMappingInputForAPI(mapping);
+			LOG.info("Input for API :" + inputMappingJSON);
 
 			
 			//Code  for calling mapping API translator
-			String path = apiURL + "create/" + mapping.getMappingName();
-			LOG.info("path :" +  path);
 			
 			HttpClient httpClient = HttpClientBuilder.create().build();
-			HttpPost postRequest = new HttpPost(path);
-
-			StringEntity inputForApi = new StringEntity(inputJSONArray.toString());
+			StringEntity inputForApi = new StringEntity(inputMappingJSON.toString());
 			inputForApi.setContentType("application/json");
-			postRequest.setEntity(inputForApi);
-
-			HttpResponse response = httpClient.execute(postRequest);
 			
-			/*if (response.getStatusLine().getStatusCode() == 201) {
-				successMessage = "successful";
+			System.out.println("ID :" + mapping.getId());
+			
+			if (StringUtils.isNotBlank(mapping.getId())) {
+				//Update
+				
+				path = apiURL + "update/" + mapping.getId();
+				LOG.info("path :" +  path);
+				HttpPut request = new HttpPut(path);
+				request.setEntity(inputForApi);
+				response = httpClient.execute(request);
 			} else {
-				successMessage = "failed"; 
-			}*/
-			
+				//Add
+				path = apiURL + "create";
+				LOG.info("path :" +  path);
+				HttpPost request = new HttpPost(path);
+				request.setEntity(inputForApi);
+				response = httpClient.execute(request);
+			}			
+			/*if (response.getStatusLine().getStatusCode() != 201  && response.getStatusLine().getStatusCode() != 200) {
+				throw new Exception("Unable to connect to translator API");
+			} */
 			LOG.info("Status code:" + response.getStatusLine().getStatusCode());
 			LOG.info("Status Line :" + response.getStatusLine());
 			LOG.info("resposne :" + response.toString());
@@ -190,9 +217,9 @@ public class MappingController {
 			LOG.error(t.getMessage());
 			return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
+	
 	
 	
 	@RequestMapping(value = "/getForNewMapping", method = RequestMethod.POST)
@@ -225,7 +252,7 @@ public class MappingController {
 			optionalFieldList = profileFieldDao.getList(search);
 			
 			//Only custom Fields
-			search.setCustomField(true);
+			search.setExtension(true);
 			search.setRequired(false);
 			search.setOptional(false);
 			customFieldList = profileFieldDao.getList(search);
@@ -253,56 +280,7 @@ public class MappingController {
 	
 	
 	
-	/*@RequestMapping(value = "/getCategorizedFieldsForMapping", method = RequestMethod.POST)
-	@ResponseBody
-	public ResponseEntity<MappingCategorizedModel> getCategorizedFieldsForMapping(@RequestBody MappingOptions mappingOptions ) {
-		List<ProfileField> mandatoryFieldList = null;
-		List<ProfileField> optionalFieldList = null;
-		List<ProfileField> customFieldList = null;
-		List<HL7Field> hl7fieldList = null;
-		List<HL7Segment> hl7segmentList = null;
-		
-		MappingCategorizedModel response = new MappingCategorizedModel();
-		ProfileFieldSearch search = new ProfileFieldSearch();
-		
-		try {
-			search.setProfileTypeId(mappingOptions.getBaseProfileTypeId());
-			
-			//Only required Fields
-			search.setRequired(true);
-			mandatoryFieldList = profileFieldDao.getList(search);
-			
-			//Only optional Fields
-			search.setRequired(false);
-			search.setOptional(true);
-			optionalFieldList = profileFieldDao.getList(search);
-			
-			//Only custom Fields
-			search.setCustomField(true);
-			search.setRequired(false);
-			search.setOptional(false);
-			customFieldList = profileFieldDao.getList(search);
-			
-			hl7segmentList = hl7SegmentDao.getAll();
-			hl7fieldList = hl7FieldDao.getAll();
-			
-			response.setHl7fieldList(hl7fieldList);
-			response.setSegmentList(hl7segmentList);
-			response.setCustomFieldList(customFieldList);
-			response.setMandatoryFieldList(mandatoryFieldList);
-			response.setOptionalFieldList(optionalFieldList);
-			
-		} catch (SecurityException se) {
-			LOG.warn(se);
-			return new ResponseEntity<MappingCategorizedModel>(HttpStatus.UNAUTHORIZED);
-		} catch (Throwable t) {
-			LOG.error(t);
-			return new ResponseEntity<MappingCategorizedModel>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-
-		return new ResponseEntity<MappingCategorizedModel>(response, HttpStatus.OK);
-	}
-	*/
+	
 	
 	private class MappingAddModel {
 		
@@ -365,50 +343,6 @@ public class MappingController {
 			this.baseProfileTypeList = baseProfileTypeList;
 		}
 	
-	}
-	
-	/*private class MappingAddModel {
-		
-		private List<Resource> resourceList;
-		private List<BaseProfileType>  basicProfileList;
-		private List<ProfileField> fieldList;
-		private List<HL7Segment> segmentList;
-		private List<HL7Field> hl7fieldList;
-		
-		
-		public List<HL7Segment> getSegmentList() {
-			return segmentList;
-		}
-		public void setSegmentList(List<HL7Segment> segmentList) {
-			this.segmentList = segmentList;
-		}
-		public List<HL7Field> getHl7fieldList() {
-			return hl7fieldList;
-		}
-		public void setHl7fieldList(List<HL7Field> hl7fieldList) {
-			this.hl7fieldList = hl7fieldList;
-		}
-		public List<ProfileField> getFieldList() {
-			return fieldList;
-		}
-		public void setFieldList(List<ProfileField> fieldList) {
-			this.fieldList = fieldList;
-		}
-		public List<Resource> getResourceList() {
-			return resourceList;
-		}
-		public void setResourceList(List<Resource> resourceList) {
-			this.resourceList = resourceList;
-		}
-		public List<BaseProfileType> getBasicProfileList() {
-			return basicProfileList;
-		}
-		public void setBasicProfileList(List<BaseProfileType> basicProfileList) {
-			this.basicProfileList = basicProfileList;
-		}
-		
-	}*/
-	
-	
+	}	
 
 }

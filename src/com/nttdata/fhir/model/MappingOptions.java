@@ -9,11 +9,43 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class MappingOptions {
 	
 	String mappingName;
-	//String mappingId;
+	String id;
 	String baseProfileTypeId;
+	String mappingType;
+	String messageType;
+	String bundleType;
+	String referenceUrlOptions;
+	String resourceCreationRule;
+	String additionalNotes;
+	
 	List<Resource> selectedResources;
 	List<ProfileField>  mappedFields;
  	
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String mappingId) {
+		this.id = mappingId;
+	}
+
+	public String getReferenceUrlOptions() {
+		return referenceUrlOptions;
+	}
+
+	public void setReferenceUrlOptions(String referenceUrlOptions) {
+		this.referenceUrlOptions = referenceUrlOptions;
+	}
+
+	public String getAdditionalNotes() {
+		return additionalNotes;
+	}
+
+	public void setAdditionalNotes(String additionalNotes) {
+		this.additionalNotes = additionalNotes;
+	}
+
 	public String getMappingName() {
 		return mappingName;
 	}
@@ -22,20 +54,44 @@ public class MappingOptions {
 		this.mappingName = mappingName;
 	}
 	
-	/*public String getMappingId() {
-		return mappingId;
-	}
-	
-	public void setMappingId(String mappingId) {
-		this.mappingId = mappingId;
-	}*/
-	
 	public String getBaseProfileTypeId() {
 		return baseProfileTypeId;
 	}
 	
 	public void setBaseProfileTypeId(String baseProfileTypeId) {
 		this.baseProfileTypeId = baseProfileTypeId;
+	}
+
+	public String getMappingType() {
+		return mappingType;
+	}
+
+	public void setMappingType(String mappingType) {
+		this.mappingType = mappingType;
+	}
+
+	public String getMessageType() {
+		return messageType;
+	}
+
+	public void setMessageType(String messageType) {
+		this.messageType = messageType;
+	}
+
+	public String getBundleType() {
+		return bundleType;
+	}
+
+	public void setBundleType(String bundleType) {
+		this.bundleType = bundleType;
+	}
+
+	public String getResourceCreationRule() {
+		return resourceCreationRule;
+	}
+
+	public void setResourceCreationRule(String resourceCreationRule) {
+		this.resourceCreationRule = resourceCreationRule;
 	}
 
 	public List<Resource> getSelectedResources() {

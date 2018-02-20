@@ -1,41 +1,35 @@
 package com.nttdata.fhir.config;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.springframework.web.servlet.view.JstlView;
+import javax.servlet.Filter;
+
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 
-@Configuration
-@EnableWebMvc
-@ComponentScan(basePackages = "com.nttdata.fhir")
 
-@PropertySources({
-	@PropertySource("classpath:fhirmapper.properties")
-})
-public class AppConfig extends WebMvcConfigurerAdapter{
-	
-	@Override
-	public void configureViewResolvers(ViewResolverRegistry registry) {
-		InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-		viewResolver.setViewClass(JstlView.class);
-		viewResolver.setPrefix("/WEB-INF/views/");
-		viewResolver.setSuffix(".jsp");
-		registry.viewResolver(viewResolver);
+public class AppConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
+	 
+    @Override
+    protected Class<?>[] getRootConfigClasses() {
+        
+    	return new Class[] { ServiceConfig.class, WebSecurityIISConfig.class };
+    }
+  
+    @Override
+	protected Class<?>[] getServletConfigClasses() {
+		
+		return new Class<?>[]{WebMvcConfig.class};
+		
 	}
-
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/static/**").addResourceLocations("/static/");
-		registry.addResourceHandler("/images/**").addResourceLocations("/images/");
-        registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
-        registry.addResourceHandler("/resources/lib/**").addResourceLocations("/resources/lib/").setCachePeriod(86400);
+  
+    @Override
+    protected String[] getServletMappings() {
+        return new String[] { "/" };
+    }
+    
+    @Override
+    protected Filter[] getServletFilters() {
+    	Filter [] singleton = { new CORSFilter() };
+    	return singleton;
 	}
-
+ 
 }

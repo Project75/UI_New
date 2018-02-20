@@ -13,6 +13,30 @@
       	ORDER BY
 	   	    baseProfileType.profileName
     </select>
+    
+    <select id="getById" resultMap="baseProfileTypeWithFieldsResult">
+		SELECT
+			 <include refid="com.nttdata.fhir.dao.mybatis.BaseProfileTypeVOMapper.Base_Column_List"/>
+			 <if test="includeFields"> 
+				, <include refid="com.nttdata.fhir.dao.mybatis.ProfileFieldVOMapper.Base_Column_List"/>
+			 </if>				
+		FROM		
+	   	   baseProfileType
+	   	    <if test="includeFields">
+	   	   	  INNER JOIN profilefield ON profilefield.profileTypeId = baseProfileType.id
+	   	   	</if>  
+	    WHERE
+	       baseProfileType.isActive = 1
+	       AND baseProfileType.id = #{profileId}
+      	ORDER BY
+	   	    baseProfileType.profileName
+    </select>
        
-    <resultMap id="baseProfileTypeResult" type="com.nttdata.fhir.model.BaseProfileType" extends="com.nttdata.fhir.dao.mybatis.BaseProfileTypeVOMapper.BaseResultMap"/>  
+    <resultMap id="baseProfileTypeResult" type="com.nttdata.fhir.model.BaseProfileType" extends="com.nttdata.fhir.dao.mybatis.BaseProfileTypeVOMapper.BaseResultMap"/>
+    
+    <resultMap id="baseProfileTypeWithFieldsResult" type="com.nttdata.fhir.model.BaseProfileType" extends="com.nttdata.fhir.dao.mybatis.BaseProfileTypeVOMapper.BaseResultMap">
+    	<collection property="fieldList" resultMap="profileFieldResult" />
+    </resultMap>
+    
+    <resultMap id="profileFieldResult" type="com.nttdata.fhir.model.ProfileField" extends="com.nttdata.fhir.dao.mybatis.ProfileFieldVOMapper.BaseResultMap"/>    
 </mapper>

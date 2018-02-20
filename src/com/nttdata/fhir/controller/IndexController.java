@@ -16,7 +16,7 @@ public class IndexController {
 	
 	@Autowired private Environment env;	
 
-   @RequestMapping(method = RequestMethod.GET)
+	@RequestMapping(method = RequestMethod.GET)
     public String index(HttpServletRequest request, Model model) {
 	   
 	   String serverInstanceName = env.getProperty("serverInstanceName", "fhirmapperui");		
@@ -24,7 +24,7 @@ public class IndexController {
         return "index";
     }
   
-   @RequestMapping(value = "/access_denied", method = RequestMethod.GET)
+	@RequestMapping(value = "/access_denied", method = RequestMethod.GET)
 	public String accessDenied(HttpServletRequest request, HttpServletResponse response, Model model) {
 		return "access_denied";
 	}

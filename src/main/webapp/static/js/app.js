@@ -17,10 +17,31 @@ fhirApp.config(function($routeProvider) {
 					    controllerAs: 'ctrl'
 					})
 			.when(
-					'/mappings/addMapping',
+					'/mappings/mappingDetail/:mappingId',
+					{
+						templateUrl : 'angularjs/templates/MappingDetail',
+						controller : 'MappingDetailCtrl',
+					    controllerAs: 'ctrl'
+					})		
+			.when(
+					'/mappings/addMapping/:mappingId',
 					{
 						templateUrl : 'angularjs/templates/AddMapping',
 						controller : 'AddMappingCtrl',
+					    controllerAs: 'ctrl'
+					})
+			.when(
+					'/profiles/profileList',
+					{
+						templateUrl : 'angularjs/templates/ProfileList',
+						controller : 'ProfileListCtrl',
+					    controllerAs: 'ctrl'
+					})
+			.when(
+					'/profiles/profileDetail/:profileId',
+					{
+						templateUrl : 'angularjs/templates/ProfileDetail',
+						controller : 'ProfileDetailCtrl',
 					    controllerAs: 'ctrl'
 					})
 					

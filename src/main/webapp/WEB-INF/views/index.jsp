@@ -52,7 +52,9 @@
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
 				<ul class="nav navbar-nav">
 					<li ng-class="{ active: headerCtrl.isActive('/mappings/mappingList')}"><a href="#!/mappings/mappingList">Mappings</a></li>
-					<li ng-class="{ active: headerCtrl.isActive('/profileList')}"><a href="#!/profileList">Profiles</a></li>
+					<li ng-class="{ active: headerCtrl.isActive('/profiles/profileList')}"><a href="#!/profiles/profileList">Profiles</a></li>
+					<li ng-class="{ active: headerCtrl.isActive('')}"><a href="">Resources</a></li>
+					<li ng-class="{ active: headerCtrl.isActive('')}"><a href="">My Work Flow</a></li>
 				</ul>				
 			</div>
 		</div>
