@@ -1,6 +1,10 @@
 package com.nttdata.fhir.controller.mapping;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -16,7 +20,9 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nttdata.fhir.dao.BaseProfileTypeDao;
 import com.nttdata.fhir.dao.HL7FieldDao;
 import com.nttdata.fhir.dao.HL7SegmentDao;
@@ -32,11 +40,13 @@ import com.nttdata.fhir.dao.ResourceDao;
 import com.nttdata.fhir.model.BaseProfileType;
 import com.nttdata.fhir.model.HL7Field;
 import com.nttdata.fhir.model.HL7Segment;
-import com.nttdata.fhir.model.MappingOptions;
+import com.nttdata.fhir.model.MappingDetailMaster;
 import com.nttdata.fhir.model.ProfileField;
 import com.nttdata.fhir.model.ProfileFieldSearch;
 import com.nttdata.fhir.model.Resource;
 import com.nttdata.fhir.service.MappingService;
+
+
 
 @RestController
 @RequestMapping("api/mapping")
@@ -80,33 +90,49 @@ public class MappingController {
 		return new ResponseEntity<MappingAddModel>(model, HttpStatus.OK);
 	}
 	
-	
-	@RequestMapping(value = "/getList", method = RequestMethod.GET)
+
+	@RequestMapping(value = "/getList/{searchStr}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public ResponseEntity<String> getList() {
+	public ResponseEntity<List<MappingDetailMaster>> getList(@PathVariable String searchStr) {
 		
+		List<MappingDetailMaster> response = new ArrayList<MappingDetailMaster>();
 		String apiURL = env.getProperty("translatorApiURL");
 		String result = null;
 		try {
 			
 			String path = apiURL + "getall/" ;
-			LOG.info("path : " +  path);
-			
-			result = mappingService.getResponseFromAPI(path);
+			LOG.info("path : " +  path);result = mappingService.getResponseFromAPI(path);
+			if (StringUtils.isNotBlank(result)) {
+				ObjectMapper mapper = new ObjectMapper();
+				List<MappingDetailMaster> mappingList = mapper.readValue(result, new TypeReference<List<MappingDetailMaster>>(){});
+				if (mappingList != null  && ! searchStr.equalsIgnoreCase("~")) {
+					response = mappingList.parallelStream().filter(mapping -> mapping.getName().contains(searchStr)
+							|| (StringUtils.isNotBlank(mapping.getReferenceUrlOptions()) && mapping.getReferenceUrlOptions().contains(searchStr))
+							|| (StringUtils.isNotBlank(mapping.getResourceCreationRules()) && mapping.getResourceCreationRules().contains(searchStr))
+							|| (StringUtils.isNotBlank(mapping.getMappingType()) && mapping.getMappingType().contains(searchStr))
+							|| (StringUtils.isNotBlank(mapping.getMessageType()) && mapping.getMessageType().contains(searchStr))
+							|| (StringUtils.isNotBlank(mapping.getBundleType()) && mapping.getBundleType().contains(searchStr))
+							|| (StringUtils.isNotBlank(mapping.getStatus()) && mapping.getStatus().contains(searchStr))
+							).collect(Collectors.toList());
+				} else {
+					response = mappingList;
+				}
+			}
 			
 		} catch (SecurityException se) {
 			LOG.warn(se.toString());
-			return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
+			return new ResponseEntity<List<MappingDetailMaster>>(HttpStatus.UNAUTHORIZED);
 		} catch (Throwable t) {
 			LOG.error(t.getMessage());
-			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<List<MappingDetailMaster>>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		return new ResponseEntity<String>(result, HttpStatus.OK);
+		return new ResponseEntity<List<MappingDetailMaster>>(response, HttpStatus.OK);
 	}
 	
 	
-	@RequestMapping(value = "/getById/{mappingId}", method = RequestMethod.GET)
+	
+	@RequestMapping(value = "/{mappingId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<String> getById(@PathVariable String mappingId) {
 		
@@ -162,53 +188,98 @@ public class MappingController {
 	}
 	
 	
-	@RequestMapping(value = "/saveMappping", method = RequestMethod.POST)
+	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Void> saveMappping(@RequestBody MappingOptions mapping ) {
+	public ResponseEntity<Void> addMapping(@RequestBody MappingDetailMaster mapping ) {
 		JSONObject inputMappingJSON = null;
 		String apiURL = env.getProperty("translatorApiURL");
 		HttpResponse response = null;
 		String path = null;
+		StringEntity inputForApi = null;
+		String mappingId = null;
+		String webUser = "admin";
 		
-		LOG.info("apiURL:" + apiURL);	
-		
-		try
-			{
-			inputMappingJSON = mappingService.createMappingInputForAPI(mapping);
-			LOG.info("Input for API :" + inputMappingJSON);
-
-			
+		try	{			
 			//Code  for calling mapping API translator
 			
-			HttpClient httpClient = HttpClientBuilder.create().build();
-			StringEntity inputForApi = new StringEntity(inputMappingJSON.toString());
+			inputMappingJSON = mappingService.createMappingInputForAPI(mapping , "Add");
+			inputForApi = new StringEntity(inputMappingJSON.toString());
 			inputForApi.setContentType("application/json");
+//			LOG.info("Input for API :" + inputMappingJSON);
+			path = apiURL + "create";
+			HttpClient httpClient = HttpClientBuilder.create().build();
+			HttpPost request = new HttpPost(path);
+			request.setEntity(inputForApi);
+			response = httpClient.execute(request);
+						
+			/*LOG.info("Status code:" + response.getStatusLine().getStatusCode());
+			LOG.info("Status Line :" + response.getStatusLine());
+			LOG.info("resposne :" + response.toString());
+			LOG.info("message:" + response.getEntity().getContent());*/
 			
-			System.out.println("ID :" + mapping.getId());
+			if (response.getStatusLine().getStatusCode() == 201) {
+				BufferedReader reader = new BufferedReader(
+						new InputStreamReader(response.getEntity().getContent()));
+
+					StringBuffer stringBuffer = new StringBuffer();
+					String line = "";
+					while ((line = reader.readLine()) != null) {
+						stringBuffer.append(line);
+					}
+					mappingId = stringBuffer.toString();
+			}
 			
-			if (StringUtils.isNotBlank(mapping.getId())) {
-				//Update
-				
-				path = apiURL + "update/" + mapping.getId();
-				LOG.info("path :" +  path);
-				HttpPut request = new HttpPut(path);
-				request.setEntity(inputForApi);
-				response = httpClient.execute(request);
-			} else {
-				//Add
-				path = apiURL + "create";
-				LOG.info("path :" +  path);
-				HttpPost request = new HttpPost(path);
-				request.setEntity(inputForApi);
-				response = httpClient.execute(request);
-			}			
-			/*if (response.getStatusLine().getStatusCode() != 201  && response.getStatusLine().getStatusCode() != 200) {
+			mappingService.updateWorkFlowStatus(mappingId,"development" ,webUser);
+			
+		} catch (SecurityException se) {
+			LOG.warn(se);
+			return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED);
+		} catch (Throwable t) {
+			LOG.error(t.getMessage());
+			return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<Void>(HttpStatus.OK);
+	}
+	
+	@Transactional
+	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> saveMapping(@RequestBody MappingDetailMaster mapping ) {
+		JSONObject inputMappingJSON = null;
+		String webUser = "admin";
+		String apiURL = env.getProperty("translatorApiURL");
+		HttpResponse response = null;
+		String path = null;
+		StringEntity inputForApi = null;
+		
+		try	{			
+			//Code  for calling mapping API translator
+			
+			inputMappingJSON = mappingService.createMappingInputForAPI(mapping ,"update");
+			LOG.info("Input for API :" + inputMappingJSON);
+			inputForApi = new StringEntity(inputMappingJSON.toString());
+			inputForApi.setContentType("application/json");
+			path = apiURL + "update/" + mapping.getId();
+			LOG.info("path :" +  path);
+			
+			HttpClient httpClient = HttpClientBuilder.create().build();
+			HttpPut request = new HttpPut(path);
+			request.setEntity(inputForApi);
+			response = httpClient.execute(request);
+					
+		/*	if (response.getStatusLine().getStatusCode() != 201  && response.getStatusLine().getStatusCode() != 200) {
 				throw new Exception("Unable to connect to translator API");
-			} */
+			} 
 			LOG.info("Status code:" + response.getStatusLine().getStatusCode());
 			LOG.info("Status Line :" + response.getStatusLine());
 			LOG.info("resposne :" + response.toString());
 			LOG.info("message:" + response.getEntity().getContent());
+			*/
+			if (mapping.isMarkedComplete()) {
+				mappingService.updateWorkFlowStatus(mapping.getId(),"testing", webUser );
+			} else {
+				mappingService.updateWorkFlowStatus(mapping.getId(),"development", webUser );
+			}
 			
 		} catch (SecurityException se) {
 			LOG.warn(se);
@@ -224,7 +295,7 @@ public class MappingController {
 	
 	@RequestMapping(value = "/getForNewMapping", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<MappingAddModel> getForNewMapping(@RequestBody MappingOptions mappingOptions ) {
+	public ResponseEntity<MappingAddModel> getForNewMapping(@RequestBody MappingDetailMaster mappingOptions ) {
 		List<ProfileField> allFieldList = null;
 		List<HL7Field> hl7fieldList = null;
 		List<HL7Segment> hl7segmentList = null;
@@ -276,6 +347,43 @@ public class MappingController {
 		}
 
 		return new ResponseEntity<MappingAddModel>(response, HttpStatus.OK);
+	}
+	
+	
+	@Transactional
+	@RequestMapping(value = "/changeStatus/{targetStatusCode}", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<String> changeStatus(@PathVariable String targetStatusCode ,@RequestBody MappingDetailMaster mapping) {
+		String webUser = "admin";	
+		
+		try {
+					
+			if ("deployed".equalsIgnoreCase(targetStatusCode)) {
+				mappingService.promoteMapping(mapping.getId(), webUser);
+			} else if ("suspended".equalsIgnoreCase(targetStatusCode)) {
+				mappingService.suspendMapping(mapping.getId(), webUser);
+			}	else if ("reviewed".equalsIgnoreCase(targetStatusCode) ||  "testing".equalsIgnoreCase(targetStatusCode) || "development".equalsIgnoreCase(targetStatusCode)
+					|| "onHold".equalsIgnoreCase(targetStatusCode)) {
+				mappingService.changeStatus(mapping.getId(), targetStatusCode ,webUser);
+				mappingService.updateWorkFlowStatus(mapping.getId(), targetStatusCode , webUser);
+			}
+			
+			
+			if ( ! StringUtils.equalsIgnoreCase(mapping.getStatus() , targetStatusCode)) {
+				
+				mapping.setStatus(targetStatusCode);
+				saveMapping(mapping);
+			}
+			
+		} catch (SecurityException se) {
+			LOG.warn(se);
+			return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
+		} catch (Throwable t) {
+			LOG.error(t);
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		return new ResponseEntity<String>( HttpStatus.OK);
 	}
 	
 	

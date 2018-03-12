@@ -62,7 +62,16 @@
 	</div>
 </div>
 
-
+<div class="row">
+	<div class="col-md-12 fhir-form-buttons">
+	  	<div class="form-group">
+			<div class="col-md-offset-10 col-md-2">			
+				<button type="button" class="btn btn-primary" ng-click="ctrl.edit()">Edit</button>
+				<button type="button" class="btn btn-default" ng-click="ctrl.go('/profiles/profileList')">Cancel</button>
+			</div>
+		</div>
+	</div>		
+</div>
 
 <div ng-show="! ctrl.pageLoadComplete">
     <span><img src="images/ajax-loader.gif" /></span>

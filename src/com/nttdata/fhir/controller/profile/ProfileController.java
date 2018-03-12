@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nttdata.fhir.controller.mapping.MappingController;
 import com.nttdata.fhir.dao.BaseProfileTypeDao;
-import com.nttdata.fhir.dao.ProfileFieldDao;
 import com.nttdata.fhir.model.BaseProfileType;
-import com.nttdata.fhir.model.ProfileField;
 
 @RestController
 @RequestMapping("api/profile")
@@ -27,7 +25,6 @@ public class ProfileController {
 	private static final Logger LOG = LogManager.getLogger(MappingController.class);
 	
 	@Autowired private BaseProfileTypeDao baseProfileTypeDao;
-	@Autowired private ProfileFieldDao profileFieldDao;
 	
 	
 

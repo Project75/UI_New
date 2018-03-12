@@ -12,6 +12,7 @@
 
  <script>
     var SERVER_INSTANCE_NAME = '${serverInstanceName}';
+    var TRANSLATOR_API_URL= '${translatorApiURL}';
 </script>
 <script src="static/combine-js.jsp"></script>
 <link href="<spring:url value="/static/lib/angular-xeditable-0.6.0/css/xeditable.css"/>" rel="stylesheet">

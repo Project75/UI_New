@@ -10,7 +10,6 @@
   <div class="modal-body">
    <form role="form" class="form-horizontal" name="form" novalidate>
 	<h1 class="ng-scope fhir-page-header">Select Fields</h1>
-	FL :: {{ctrl.optionalFieldList.length}}
 	<div ng-repeat="gridItem in modalOptions.optionalFieldList track by $index">
 		<div class="row">
 			<div class="col-sm-6">

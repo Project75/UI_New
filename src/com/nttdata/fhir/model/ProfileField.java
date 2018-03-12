@@ -6,6 +6,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.nttdata.fhir.model.mybatis.ProfileFieldVO;
 
@@ -21,6 +22,7 @@ public class ProfileField extends ProfileFieldVO {
 	private String hl7Field;
 	private String staticValue;
 	
+
 	public String getStaticValue() {
 		return staticValue;
 	}
@@ -79,6 +81,8 @@ public class ProfileField extends ProfileFieldVO {
 		this.totalOccurences = totalOccurences;
 	}
 
+	
+	@JsonIgnore
 	public List<String> getStaticValuesList() {
 		
 		List<String> staticValuesList = null;
@@ -90,6 +94,10 @@ public class ProfileField extends ProfileFieldVO {
 		        	staticValuesList.add(st.nextToken().trim());
 			 }  	
 		}	
+		
+		if ( !StringUtils.contains(getStaticValue(), "other")) {
+			staticValuesList.add("other");
+		}
 		return staticValuesList;
 	}	
 	

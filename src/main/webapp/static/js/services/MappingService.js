@@ -5,12 +5,12 @@
 		var MappingService = {};
 			
 		
-		MappingService.getList = function() {			
-			 return $http.get('/' + SERVER_INSTANCE_NAME + '/api/mapping/getList');
+		MappingService.getList = function(searchStr) {
+			return $http.get('/' + SERVER_INSTANCE_NAME + '/api/mapping/getList/' + searchStr);
 		};
 		
 		MappingService.getById = function(mappingId) {			
-			 return $http.get('/' + SERVER_INSTANCE_NAME + '/api/mapping/getById/' + mappingId);
+			 return $http.get('/' + SERVER_INSTANCE_NAME + '/api/mapping/' + mappingId);
 		};
 		
 		
@@ -23,12 +23,21 @@
 		};
 		
 		MappingService.saveMappping = function(mapping) {
-		   return $http.post('/' + SERVER_INSTANCE_NAME + '/api/mapping/saveMappping' ,mapping);
+		   return $http.post('/' + SERVER_INSTANCE_NAME + '/api/mapping/save' ,mapping);
 		};
+		
+		MappingService.addMappping = function(mapping) {
+			   return $http.post('/' + SERVER_INSTANCE_NAME + '/api/mapping/add' ,mapping);
+			};
 				
 		MappingService.deleteMappping = function(mappingId) {
-			   return $http.get('/' + SERVER_INSTANCE_NAME + '/api/mapping/delete/' + mappingId);
-			};
+			return $http.get('/' + SERVER_INSTANCE_NAME + '/api/mapping/delete/' + mappingId);
+			//return $http.delete(TRANSLATOR_API_URL + 'delete/' + mappingId);
+		};
+		
+		MappingService.changeStatus = function(mapping, targetStatusCode){
+			return $http.post('/' + SERVER_INSTANCE_NAME + '/api/mapping/changeStatus/' + targetStatusCode , mapping);
+		};
 		
 		
 		

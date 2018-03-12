@@ -19,7 +19,9 @@ public class IndexController {
 	@RequestMapping(method = RequestMethod.GET)
     public String index(HttpServletRequest request, Model model) {
 	   
-	   String serverInstanceName = env.getProperty("serverInstanceName", "fhirmapperui");		
+		String serverInstanceName = env.getProperty("serverInstanceName", "fhirmapperui");
+		String translatorApiURL = env.getProperty("translatorApiURL");
+		model.addAttribute("translatorApiURL", translatorApiURL);
 		model.addAttribute("serverInstanceName", serverInstanceName);
         return "index";
     }

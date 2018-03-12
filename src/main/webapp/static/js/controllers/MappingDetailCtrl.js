@@ -1,5 +1,5 @@
 (function(){	
-	function MappingDetailCtrl($scope, $route, $routeParams, $location, MappingService, NotificationService, ErrorHandlerService) {		
+	function MappingDetailCtrl($scope, $route, $routeParams, $location, MappingService, ModalService, NotificationService, ErrorHandlerService) {		
 		var vm = this;
 		vm.messages = NotificationService.messages;
 		vm.errors = NotificationService.errors;
@@ -23,12 +23,35 @@
 		    .then(function (response) {
 		    	vm.mapping  = response.data;
 		    	vm.fieldList = vm.mapping.mappingDetail;
+		    	//vm.mapping.mappedFields = vm.fieldList;
 		    	vm.pageLoadComplete = true;
 		    })
 		    .catch(function (response) {
 		    	vm.pageLoadComplete = true;
 		    	ErrorHandlerService.handleError(response, vm.errors, "Error retrieving mapping details.");
 		    });	
+		}
+		
+		vm.changeStatus = function() {
+			
+			var modalDefaults = {
+					templateUrl: '/' + SERVER_INSTANCE_NAME + '/angularjs/templates/MappingStatusChangeModal',
+					windowClass: 'fhir-mappingStatusChangeModal'
+				};
+					
+	    	var modalOptions = {
+	    			closeButtonText: 'Close',
+					actionButtonText: 'Save',
+					headerText: 'Are you sure?',
+					mapping : vm.mapping
+			};
+		        
+			ModalService.showModal(modalDefaults, modalOptions).then(function(response) {
+				$route.reload();
+			}).catch(function (response) {
+				//Added so that no error is displayed on console for canceling the modal .
+	        });
+			
 		}
 		
 		

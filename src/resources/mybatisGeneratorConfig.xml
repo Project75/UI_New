@@ -69,6 +69,16 @@
         <generatedKey column="id" identity="true" sqlStatement="SELECT LAST_INSERT_ID()"/>
     </table>
     
+    <table tableName="workflow" alias="workflow" domainObjectName="WorkflowVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+        <generatedKey column="id" identity="true" sqlStatement="SELECT LAST_INSERT_ID()"/>
+    </table>
+    
+    <table tableName="workflowstatus" alias="workflowstatus" domainObjectName="WorkflowStatusVO"  modelType="flat">
+        <property name="useActualColumnNames" value="true"/>
+        <generatedKey column="id" identity="true" sqlStatement="SELECT LAST_INSERT_ID()"/>
+    </table>
+    
     
 		
     <!-- <table tableName="roleActivity" alias="roleActivity" domainObjectName="RoleActivityVO"  modelType="flat">

@@ -16,6 +16,7 @@
     	vm.optionalFieldList = []; 
     	vm.customFieldList = [];
     	vm.allFieldList = [];
+    	vm.hl7fieldList = [];
     	vm.mandatoryCompletedFields = [];
     	vm.fieldList = []; //Common var used for common reference on jsp
 
@@ -71,12 +72,11 @@
 			
 			MappingService.getForNewMapping(vm.mapping)
 		    .then(function (response) {
-		    	
-		    	vm.mandatoryFieldList = response.data.mandatoryFieldList; 
-		    	vm.optionalFieldList = response.data.optionalFieldList;		    	
+		    	vm.mandatoryFieldList = response.data.mandatoryFieldList;
+		    	vm.optionalFieldList = response.data.optionalFieldList;
 		    	vm.customFieldList = response.data.customFieldList;
 		    	vm.allFieldList = response.data.allFieldList;
-		    	vm.hl7fieldList = response.data.hl7fieldList ;
+		    	vm.hl7fieldList = response.data.hl7fieldList;
 		    	vm.segmentList = response.data.segmentList ;
 		    	
 		    	for (var i=0 ; i < vm.optionalFieldList.length; i++ ) {
@@ -94,22 +94,24 @@
 		    		
 		    		if (vm.allFieldList[i].staticValuesList != null  && vm.allFieldList[i].staticValuesList != undefined) {
 		    			vm.allFieldList[i].showStaticValues = true;
-		    		}
-		    		
+		    		}	
 		    	}
 		    	
 		    	if (vm.isSequentialView == true) {
 		    		vm.fieldList = vm.allFieldList;
-		    		
 		    	} else {
 		    		vm.fieldTypes[0].IsOpened = true;
 		    	}
 		    	
-		    	if (vm.option == 'existingMapping') {
-		    		vm.fieldList = vm.referencedMapping.mappingDetail;
+		    	if (vm.option == 'existingMapping'  || vm.mode == 'Update') {
+		    		if (vm.option == 'existingMapping') {
+		    			vm.fieldList = vm.referencedMapping.mappingDetail;
+		    		}
+		    		if (vm.mode == 'Update') {
+		    			vm.fieldList = vm.mapping.mappingDetail;
+		    		}
 		    		vm.initializeFieldList(vm.fieldList);
 		    	}
-		    	
 		    	
 		    	vm.calculateProgress();
 		    	vm.pageLoadComplete = true;
@@ -136,10 +138,6 @@
 		}
 		
 		vm.getMappingById = function(mappingId) {
-			
-			console.log("ID:" , mappingId);
-			//mappingId = vm.mapping.copiedMappingId;
-			
 			MappingService.getById(mappingId)
 		    .then(function (response) {
 		    	
@@ -147,9 +145,7 @@
 		    		vm.referencedMapping  = response.data;
 		    	} else {
 		    		vm.mapping  = response.data;
-		    		console.log("vm.mapping:" , vm.mapping);
-		    		vm.fieldList = vm.mapping.mappingDetail;
-		    		vm.initializeFieldList(vm.fieldList);
+		    		vm.init();
 		    	}
 		    	
 		    })
@@ -162,13 +158,14 @@
 		
 		if ($routeParams.mappingId == 0) {			
 			vm.mode = "Add";
+			vm.message = "added";
 			vm.getForAddInit();
 			
 		} else {			
 			vm.mode = "Update";
+			vm.message = "updated";
 			vm.showMappingInitialScreen = false;
 			vm.getMappingById($routeParams.mappingId);
-			vm.init();
 		}
 		
 		vm.onRadioChange = function() {			
@@ -231,7 +228,6 @@
 		
 		vm.onSegmentChange = function(gridItem) {
 			gridItem.hl7fieldList = [];
-			
 			for (var i=0; i < vm.hl7fieldList.length ; i++) {
 				if (gridItem.hl7Segment) {
 					if (vm.hl7fieldList[i].segmentName == gridItem.hl7Segment) {
@@ -243,6 +239,7 @@
 		
 		
 		vm.addOccurrence = function(gridItem) {
+			
 			var newItem = angular.copy(gridItem);
 			newItem.isRequired = false;
 			newItem.isRepeating = false;
@@ -253,6 +250,8 @@
 			if (index > -1 && gridItem.totalOccurences < 10) {
 					vm.fieldList.splice(index + 1 , 0 , newItem);
 					gridItem.totalOccurences ++ ;
+			} else if (index == -1) {
+				vm.fieldList.push(newItem);
 			}
 		}
 		
@@ -307,6 +306,28 @@
 		  }
 		  
 		vm.showOptionalFieldDialog = function() {
+			var idx;
+			
+			if (vm.mode == 'Update') {
+				console.log(" HAHHAHHA");
+				/*for (var i = 0; i < vm.fieldList.length; i++) {	
+					vm.optionalFieldList.forEach(function(element)) {
+						 if (element.fieldName  == vm.fieldList[i].fieldName) {
+							 
+						 }
+						
+					}); 
+					
+				
+					idx = vm.optionalFieldList.findIndex(vm.fieldList[i] =>  vm.fieldList[i].fieldName == );
+					console.log("idx :" + idx);
+					if (idx > -1) {
+						vm.optionalFieldList.splice(idx, 1);
+						console.log("Spliced.");
+					}
+				}*/
+			}
+			
 			var modalDefaults = {
 					templateUrl: '/' + SERVER_INSTANCE_NAME + '/angularjs/templates/AddOptionalFieldModal',
 					windowClass: 'fhir-addMappingModal'
@@ -321,7 +342,6 @@
 	        
 			ModalService.showModal(modalDefaults, modalOptions).then(function(response) {
 				
-				console.log("modalOptions.optionalFieldList.length:" , modalOptions.optionalFieldList.length) ;
 				for (var i=0 ; i < modalOptions.optionalFieldList.length ; i++) {
 				
 					if (modalOptions.optionalFieldList[i].isSelected == true) {
@@ -340,7 +360,7 @@
 		}
 
 		
-		vm.save = function() {
+		vm.add = function() {
 			
 			/*for (var i=0 ; i < vm.fieldList.length ; i++) {
 				console.log("In for");
@@ -359,28 +379,22 @@
 	        }*/
 			
 			if (vm.isSequentialView == true) {
-				vm.mapping.mappedFields = vm.fieldList;
-				console.log(" Total no of fields : " , vm.mapping.mappedFields.length);
+				vm.mapping.mappingDetail = vm.fieldList;
 			} else {
-				vm.mapping.mappedFields = vm.mandatoryFieldList;
+				vm.mapping.mappingDetail = vm.mandatoryFieldList;
 				
 				if (vm.optionalFieldList.length > 0) {
-					vm.mapping.mappedFields = vm.mapping.mappedFields.concat(vm.optionalFieldList);
+					vm.mapping.mappingDetail = vm.mapping.mappingDetail.concat(vm.optionalFieldList);
 				}
 				
 				if (vm.customFieldList.length > 0) {
-					vm.mapping.mappedFields = vm.mapping.mappedFields.concat(vm.customFieldList);
+					vm.mapping.mappingDetail = vm.mapping.mappingDetail.concat(vm.customFieldList);
 				}
-				console.log(" Total no of fields : " , vm.mapping.mappedFields.length);
 			}
 			
-			
-			console.log("vm.mapping:" ,vm.mapping);
-			MappingService.saveMappping(vm.mapping)
+			MappingService.addMappping(vm.mapping)
 		    .then(function (response) {
-		    	
-		    	console.log("resposne :" , response );
-		    	NotificationService.addMessage("Mapping - "  + vm.mapping.mappingName + " added successfully.");
+		    	NotificationService.addMessage("Mapping - "  + vm.mapping.name + " " + vm.message + " successfully.");
 				$location.path("/mappings/mappingList");
 		    })
 		    .catch(function (response) {
@@ -388,6 +402,57 @@
 		    });	
 		}
 		
+		
+		vm.update = function() {
+			
+			/*for (var i=0 ; i < vm.fieldList.length ; i++) {
+				console.log("In for");
+				if (vm.fieldList[i].isRequired == false  &&  vm.fieldList[i].hl7Segment) {
+					console.log("In 1 if " , i);
+					if (vm.fieldList[i].hl7Field == undefined || vm.fieldList[i].hl7Field == null) {
+						console.log("In 2 if :" ,i);
+						vm.fieldList[i].fieldForm.field.$error.required = true;
+					}
+				}
+			}*/
+			
+			/*$scope.$broadcast('show-errors-check-validity');
+			if ($scope.addMappingForm.$invalid) {
+				return; 
+	        }*/
+			
+			if (vm.isSequentialView == true) {
+				vm.mapping.mappingDetail = vm.fieldList;
+			} else {
+				vm.mapping.mappingDetail = vm.mandatoryFieldList;
+				
+				if (vm.optionalFieldList.length > 0) {
+					vm.mapping.mappingDetail = vm.mapping.mappingDetail.concat(vm.optionalFieldList);
+				}
+				
+				if (vm.customFieldList.length > 0) {
+					vm.mapping.mappingDetail = vm.mapping.mappingDetail.concat(vm.customFieldList);
+				}
+			}
+			
+			MappingService.saveMappping(vm.mapping)
+		    .then(function (response) {
+		    	NotificationService.addMessage("Mapping - "  + vm.mapping.name + " " + vm.message + " successfully.");
+				$location.path("/mappings/mappingList");
+		    })
+		    .catch(function (response) {
+		    	ErrorHandlerService.handleError(response, vm.errors, "Error updating mapping");
+		    });	
+		}
+		
+		
+		vm.onStaticValueChange = function(item) {
+			if (item.staticValue == 'other') {
+				item.showStaticInput = true;
+			} else {
+				item.showStaticInput = false;
+			}
+		} 
 		
 		vm.fieldTypes.forEach(function(item) {
             var isOpened = false;

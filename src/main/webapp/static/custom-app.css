@@ -68,6 +68,11 @@ color:#c31212;
 }
 
 
+.fhir-mappingStatusChangeModal .modal-dialog { 
+  width: 600px;
+}
+
+
 
 
 .fhir-logPropertyTable td:first-of-type {

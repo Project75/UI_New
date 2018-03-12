@@ -9,6 +9,7 @@
 	   	   profileField
 	    WHERE
 	       profileField.profileTypeId = #{profileTypeId}
+	    ORDER BY profileField.fieldName 	   
     </select>
     
     <select id="getList" resultMap="profileFieldResult">
@@ -27,6 +28,7 @@
 		   <if test = "(search.extension)">
 			     AND	profileField.isExtension = 1
 		   </if>
+		 ORDER BY profileField.fieldName  
     </select>
     
            

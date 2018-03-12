@@ -33,7 +33,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter{
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/static/**").addResourceLocations("/static/");
-		registry.addResourceHandler("/images/**").addResourceLocations("/images/");
+		registry.addResourceHandler("/images/**").addResourceLocations("/static/images/");
         registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
         registry.addResourceHandler("/static/lib/**").addResourceLocations("/static/lib/").setCachePeriod(86400);
 	}

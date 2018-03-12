@@ -43,7 +43,7 @@
             <div class="form-group" show-errors>						
 				<label for="mappingName" class="col-sm-4 control-label">Mapping Name*</label> 
 				<div class="col-sm-8">
-	                <input name='mappingName' type="text" class="form-control" id="mappingName" maxlength="100" ng-model="ctrl.mapping.mappingName" required>
+	                <input name='mappingName' type="text" class="form-control" id="mappingName" maxlength="100" ng-model="ctrl.mapping.name" required>
 			   		<p class="help-block" ng-show="addMappingInitForm.mappingName.$error.maxlength">Max Length Exceeded</p>
 			   		<p class="help-block" ng-show="addMappingInitForm.mappingName.$error.required">Name is required</p>
 	        	</div>				
@@ -254,7 +254,7 @@
 
 <form role="form" class="form-horizontal" name="addMappingForm" novalidate>
 <div ng-show="! ctrl.pageLoadComplete">
-    <span><img src="/${serverInstanceName}/src/main/webapp/static/images/ajax-loader.gif" /></span>
+    <span><img src="/images/ajax-loader.gif" /></span>
 </div>	
  <div id="sequentialDiv" ng-show="ctrl.isSequentialView && !ctrl.showMappingInitialScreen && ctrl.pageLoadComplete">
  	
@@ -278,7 +278,7 @@
 					    </div>
 					    <div class="col-md-4"  ng-show="gridItem.showStaticValues"> 
 							<select ng-model="gridItem.staticValue" ng-options="staticUse for staticUse in gridItem.staticValuesList"  
-										class="form-control" id="staticUse" name="staticUse"  ng-required="ctrl.isSequentialView && gridItem.showStaticValues">						  
+										class="form-control" id="staticUse" name="staticUse" ng-change="ctrl.onStaticValueChange(gridItem)" ng-required="ctrl.isSequentialView && gridItem.showStaticValues">						  
 							</select>									
 						</div>
 					</div>
@@ -298,7 +298,7 @@
 					</div>
 				</div> -->
 				
-				<div class="col-sm-3">	
+				<div class="col-sm-3" ng-hide="gridItem.showStaticInput">	
 					<div class="form-group" show-errors>
 						<label for="hl7Segment" class="col-sm-4 control-label" ng-show="!gridItem.isRequired">HL7 Segment</label>
 						<label for="hl7Segment" class="col-sm-4 control-label" ng-show="gridItem.isRequired">HL7 Segment*</label>
@@ -312,7 +312,7 @@
 					</div>
 				</div>
 				
-				<div class="col-sm-3">	
+				<div class="col-sm-3" ng-hide="gridItem.showStaticInput">	
 					<div class="form-group" show-errors>
 						<label for="field" class="col-sm-4 control-label" ng-show="!gridItem.isRequired">HL7 Field</label>
 						<label for="field" class="col-sm-4 control-label" ng-show="gridItem.isRequired">HL7 Field*</label>
@@ -327,8 +327,16 @@
 					</div>
 				</div>
 				
+				<div class="col-sm-3" ng-show="gridItem.showStaticInput">
+					<div class="form-group" show-errors>
+						<input name='staticText' type="text" class="form-control" id="staticText" maxlength="100" ng-model="gridItem.staticText" required>
+			   			<p class="help-block" ng-show="fieldForm.staticText.$error.maxlength">Max Length Exceeded</p>
+			   			<p class="help-block" ng-show="fieldForm.staticText.$error.required">Name is required</p>
+					</div>
+				</div>	
+				
 				<div class="col-sm-1">
-					<p class="col-sm-6" ng-show="gridItem.showRemoveButton"><a href="" ng-click="ctrl.removeOccurrence(gridItem)" role="button" class="btn btn-secondary">
+					<p class="col-sm-6" ng-show="gridItem.showRemoveButton && ctrl.mode == 'Update' "><a href="" ng-click="ctrl.removeOccurrence(gridItem)" role="button" class="btn btn-secondary">
 					    <span class="glyphicon glyphicon-remove" style="color:red"></span></a></p>
 					<p class="col-sm-6" ng-show="(gridItem.isRepeating  && (10 > gridItem.totalOccurences ))"><a href="" ng-click="ctrl.addOccurrence(gridItem)" role="button" class="btn btn-secondary">
 					    <span class="glyphicon glyphicon-plus" style="color:#0D4F8B"></span></a></p>
@@ -392,7 +400,7 @@
 						<label for="hl7Segment" class="col-sm-4 control-label" ng-show="!gridItem.isRequired">HL7 Segment</label>
 						<label for="hl7Segment" class="col-sm-4 control-label" ng-show="gridItem.isRequired">HL7 Segment*</label>
 						<div class="col-md-8"> 
-						<select ng-model="gridItem.hl7Segment" ng-options="segment.segmentName for segment in ctrl.segmentList"  
+						<select ng-model="gridItem.hl7Segment" ng-options="segment.segmentName as segment.segmentName for segment in ctrl.segmentList"  
 									class="form-control" id="segment" name="segment"  ng-change="ctrl.onSegmentChange(gridItem)" ng-required="!ctrl.isSequentialView && gridItem.isRequired">	
 								 <option value="">--Select Segment--</option>						  
 						</select>
@@ -406,7 +414,7 @@
 						<label for="field" class="col-sm-4 control-label" ng-show="!gridItem.isRequired">HL7 Field</label>
 						<label for="field" class="col-sm-4 control-label" ng-show="gridItem.isRequired">HL7 Field*</label>
 						<div class="col-md-8"> 
-						<select ng-model="gridItem.hl7Field" ng-options="field.fieldName for field in gridItem.hl7fieldList"  
+						<select ng-model="gridItem.hl7Field" ng-options="field.fieldName as field.fieldName for field in gridItem.hl7fieldList"  
 									class="form-control" id="field" name="field" ng-required="!ctrl.isSequentialView && (gridItem.isRequired ||gridItem.isNowRequired)"  ng-change="ctrl.calculateProgress(gridItem)">	
 								 <option value="">--Select Field--</option>						  
 						</select>
@@ -441,12 +449,23 @@
 	   </div><!-- End of repetion for accordion  -->
 	  </uib-accordion>
     </div>
-</div>  <!-- Categorized div ending -->    
+</div>  <!-- Categorized div ending -->
+	<div class="row" ng-show ="!ctrl.showMappingInitialScreen && ctrl.mapping.status == 'Development'">
+		<div class="col-md-12 fhir-form-buttons">
+	  		<div class="form-group">
+				<div class="col-md-offset-10 col-md-2">
+					<label>Mark as complete ?<input type="checkbox" ng-model="ctrl.mapping.markedComplete" /> </label> 
+				</div>
+			</div>
+	   </div>
+   </div>			
+
    <div class="row" ng-show ="!ctrl.showMappingInitialScreen">
 	<div class="col-md-12 fhir-form-buttons">
 	  	<div class="form-group">
 			<div class="col-md-offset-10 col-md-2">			
-				<button type="submit" class="btn btn-primary" ng-click="ctrl.save()">Save</button>
+				<button type="submit" class="btn btn-primary" ng-click="ctrl.add()" ng-hide="ctrl.mode=='Update'"> Save</button>
+				<button type="submit" class="btn btn-primary" ng-click="ctrl.update()" ng-show="ctrl.mode=='Update'">Update</button>
 				<button type="button" class="btn btn-default" ng-click="ctrl.go('/mappings/mappingList')">Cancel</button>
 			</div>
 		</div>

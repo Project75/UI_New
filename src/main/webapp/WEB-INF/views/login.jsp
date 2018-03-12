@@ -3,16 +3,19 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<!DOCTYPE html>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+		<link rel="shortcut icon" href="/fhirmapperui/images/logo01.png" />
 		<title>FHIR Login page</title>
+		<script src="static/combine-js.jsp"></script>
 		<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.css" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
 		<link href="<spring:url value="/static/lib/bootstrap-3.3.7/css/bootstrap.min.css"/>" rel="stylesheet">
 		<link href="<spring:url value="/static/lib/bootstrap-3.3.7/css/bootstrap-theme.min.css"/>" rel="stylesheet">
 		<link href="<spring:url value="/static/custom.css"/>" rel="stylesheet">
-		<script src="static/combine-js.jsp"></script>
+		
 
 		
 		
@@ -99,7 +102,7 @@
 					  </c:if>
 					  <div class="input-group">
 						<label class="input-group-addon" for="username"><span class="glyphicon glyphicon-user"></span></label>
-						<input type="text" class="form-control" id="username" name="ssoId" placeholder="Enter Username" required>
+						<input type="text" class="form-control" id="username" name="username" placeholder="Enter Username" required>
 			          </div>
 					  <div class="input-group">
 						<label class="input-group-addon" for="password"><span class="glyphicon glyphicon-lock"></span></label> 

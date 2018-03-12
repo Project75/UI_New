@@ -48,7 +48,7 @@ public class WebSecurityIISConfig extends WebSecurityConfigurerAdapter {
 		    		  .formLogin()
 		    		      .loginPage("/login.request")
 			            .loginProcessingUrl("/login")
-			            .usernameParameter("ssoId").passwordParameter("password")
+			            .usernameParameter("username").passwordParameter("password")
 			            .defaultSuccessUrl("/")
 			            .failureUrl("/login?error")
 			            .permitAll()// this is to fall back when PreAuth (IIS Auth) Fails with SSO.  still allowed to log in with LDAP

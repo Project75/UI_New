@@ -28,28 +28,79 @@
 		<div class="col-sm-6">
 			<dt>Status</dt>
 			<dd>
-				{{ctrl.mapping.status}}
+				{{ctrl.mapping.status | capitalize}}
 			</dd>
 		</div>
-	</dl>
-</div>
-<div class="col-sm-12">
-	<dl class="dl-horizontal" >
-		<div class="col-sm-6">				
-			<dt>Resources</dt>
-			<dd>
-				{{ctrl.mapping.resources}}
-			</dd>
-		</div>
-		<!-- <div class="col-sm-6">
-			<dt>Status</dt>
-			<dd>
-				{{ctrl.mapping.status}}
-			</dd>
-		</div> -->
 	</dl>
 </div>
 
+<div>
+	<div class="col-sm-12">
+		<dl class="dl-horizontal" >
+			<div class="col-sm-6">				
+				<dt>Type</dt>
+				<dd>
+					{{ctrl.mapping.mappingType}}
+				</dd>
+			</div>
+			<div class="col-sm-6">				
+				<dt>Reference URL Option</dt>
+				<dd>
+					{{ctrl.mapping.referenceUrlOptions}}
+				</dd>
+			</div>
+		</dl>
+	</div>
+	
+	<div class="col-sm-12">
+		<dl class="dl-horizontal" >
+			<div class="col-sm-6">
+				<dt>Message Type</dt>
+				<dd>
+					{{ctrl.mapping.messageType}}
+				</dd>
+			</div>
+			<div class="col-sm-6" ng-show="ctrl.mapping.messageType=='bundle'">				
+				<dt>Bundle Type</dt>
+				<dd>
+					{{ctrl.mapping.bundleType}}
+				</dd>
+			</div>
+			
+		</dl>
+	</div>
+	
+	<div class="col-sm-12">
+		<dl class="dl-horizontal" >
+			<div class="col-sm-6">
+				<dt>Resource Creation Rule</dt>
+				<dd>
+					{{ctrl.mapping.resourceCreationRules}}
+				</dd>
+			</div>
+			<div class="col-sm-6">
+				<dt>Resources</dt>
+				<dd>
+					{{ctrl.mapping.resources}}
+				</dd>
+			</div>
+		</dl>
+	</div>
+	
+	<div class="col-sm-12">
+		<dl class="dl-horizontal" >
+			<div class="col-sm-12">				
+				<dt>Additional Notes</dt>
+				<dd>
+					{{ctrl.mapping.additionalNotes}}
+				</dd>
+			</div>
+		</dl>
+	</div>
+</div>	
+<br/>
+<br>
+<br>
 <legend> Field Details </legend>
 <div class="row">
 	<div class="col-sm-12">
@@ -62,13 +113,17 @@
 						<th class="info" field-name="staticValue" display-name="Use"></th>
 						<th class="info" field-name="hl7Segment" display-name="HL7 Segment"></th>
 						<th class="info" field-name="hl7Field"  display-name="HL7 Field"></th>
-						<th class="info" field-name="isExtension"  display-name="User-Defined"></th>
+						<th class="info" field-name="isRequired"  display-name="Required Field"></th>
+						<th class="info" field-name="isExtension"  display-name="Extension Field"></th>
 					</tr>
 				</thead>
                 <tbody>
                     <tr>
+                    	<td field-name="isRequired" >
+                        	<span ng-show="{{gridItem.isRequired}}"  class="glyphicon glyphicon-asterisk"></span>
+                        </td>
                     	<td field-name="isExtension" >
-                        	<span ng-show="{{gridItem.isExtension}}"> Y </span>
+                        	<span ng-show="{{gridItem.isExtension}}"  class="glyphicon glyphicon-asterisk"></span>
                         </td>
                     </tr>	       
                 </tbody>	
@@ -77,6 +132,17 @@
 	</div>
 </div>
 
+<div class="row">
+	<div class="col-md-12 fhir-form-buttons">
+	  	<div class="form-group">
+			<div class="col-md-offset-9 col-md-2">
+				<button type="button" class="btn btn-warning" ng-click="ctrl.changeStatus()">Change Status</button>		
+				<button type="button" class="btn btn-primary" ng-click="ctrl.go('mappings/addMapping/' + ctrl.mapping.id)"  ng-show="ctrl.mapping.status =='development' || ctrl.mapping.status == 'testing'">Edit</button>
+				<button type="button" class="btn btn-default" ng-click="ctrl.go('/mappings/mappingList')">Cancel</button>
+			</div>
+		</div>
+	</div>		
+</div>
 
 
 <div ng-show="! ctrl.pageLoadComplete">
